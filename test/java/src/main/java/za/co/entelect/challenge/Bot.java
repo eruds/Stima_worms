@@ -42,9 +42,10 @@ public class Bot {
         );
 
         if (currentWorm.id == 2 && canBananaBomb(closestWormPosition.x, closestWormPosition.y)) {
-            if( !previousCommand.equals("move") && !previousCommand.equals("dig")){
-                return new ThrowBananaBomb(closestWormPosition.x, closestWormPosition.y);
-            }
+            return new ThrowBananaBomb(closestWormPosition.x, closestWormPosition.y);
+//
+//            if( !previousCommand.equals("move") && !previousCommand.equals("dig")){
+//            }
         }
 
         if(canShootEnemy(closestWormPosition.x, closestWormPosition.y)){
@@ -140,18 +141,25 @@ public class Bot {
     }
 
     // Attack Helpers
-    private HashMap<String, Worm[]> wormInAttackRadius(int x, int y, int damageRadius){
-        HashMap<String, Worm[]> wormsInArea = new HashMap<String, Worm[]>() ;
-        wormsInArea.put("Player", new ArrayList<>());
-        wormsInArea.put("Opponent", new ArrayList<>());
+    private HashMap<String, ArrayList<Worm>> wormInAttackRadius(int x, int y, int damageRadius){
+        HashMap<String, ArrayList<Worm>> wormsInArea = new HashMap<>() ;
+        wormsInArea.put("Player", new ArrayList<Worm>());
+        wormsInArea.put("Opponent", new ArrayList<Worm>());
 
         for(int i = 0; i < 3; i++){
             MyWorm myWorm = this.myWorms[i];
             Worm opponent = this.opponent.worms[i];
             int distancePlayer = euclideanDistance(myWorm.position.x, myWorm.position.y, x, y);
             int distanceOpponent = euclideanDistance(opponent.position.x, opponent.position.y, x, y);
+            if(distancePlayer <= damageRadius){
+                wormsInArea.get("Player").add(myWorm);
+            }
+
+            if(distanceOpponent <= damageRadius){
+                wormsInArea.get("Player").add(opponent);
+            }
         }
-        return wormCount;
+        return wormsInArea;
     }
 
     // Attacks
@@ -191,30 +199,14 @@ public class Bot {
 
                 //Checking if there's any of our player worm in the target
                 int damageRadius = currentWorm.bananaBombs.damageRadius;
-                int[] wormCount = wormInAttackRadius(x,y,damageRadius);
-                return wormCount[0] <= 0 && wormCount[1] >= 2;
+                HashMap<String, ArrayList<Worm>> wormsInArea = wormInAttackRadius(x,y,damageRadius);
+                return wormsInArea.get("Player").size() <= 0 && wormsInArea.get("Opponent").size() >= 1;
             }
         return false;
     }
 
     private boolean canSnowball(int x, int y) {
         if (isValidCoordinate(x, y) && currentWorm.snowballs.count > 0) {
-            // Checking if the target is frozen
-            Worm Target = new Worm();
-            // To Avoid Null
-            Target.roundsUntilUnfrozen = 0;
-
-            for( Worm worm : opponent.worms){
-                if(worm.position.x == x && worm.position.y == y){
-                    Target = worm;
-                }
-            }
-
-            // if the target is still frozen
-            if(Target.roundsUntilUnfrozen > 0 ){
-                return false;
-            }
-
             // Checking if the opponent worm is close enough
             int snowballRange = currentWorm.snowballs.range;
             int distance = euclideanDistance(currentWorm.position.x, currentWorm.position.y, x, y);
@@ -224,8 +216,16 @@ public class Bot {
 
             //Checking if there's any of our player worm in the target
             int damageRadius = currentWorm.snowballs.freezeRadius;
-            int[] wormCount = wormInAttackRadius(x,y,damageRadius);
-            return wormCount[0] <= 0 && wormCount[1] >= 2;
+            HashMap<String, ArrayList<Worm>> wormsInArea = wormInAttackRadius(x,y,damageRadius);
+            ArrayList<Worm> OpponentWorms = wormsInArea.get("Opponent");
+            for(Worm worm : OpponentWorms){
+                if(worm.roundsUntilUnfrozen > 1){
+                    return false;
+                }
+            }
+            System.out.println("InRange : " + wormsInArea.get("Player").size() + " " + wormsInArea.get("Opponent").size() );
+
+            return wormsInArea.get("Player").size() <= 0 && wormsInArea.get("Opponent").size() >= 1;
         }
         return false;
     }
