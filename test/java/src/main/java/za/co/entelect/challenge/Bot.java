@@ -14,6 +14,7 @@ public class Bot {
     private GameState gameState;
     private Opponent opponent;
     private MyWorm currentWorm;
+    private PowerUp powerup;
     private MyWorm[] myWorms;
     private String previousCommand;
 
@@ -72,6 +73,18 @@ public class Bot {
         }
         // Follow strategy end
 
+        // powerup start
+
+        int i = 0;
+        int powerupCount = 0;
+        for (i; i<=5; i++){
+            if (powerupCount == 0){
+                powerUpStrat();
+            }
+        }
+
+        
+
         Cell block = getCellToMove(moveDirection);
         if (block.type == CellType.AIR && !IsCellOccupied(block)) {
             return new MoveCommand(block.x, block.y);
@@ -125,6 +138,47 @@ public class Bot {
             return new DigCommand(block.x, block.y);
         }
         return new DoNothingCommand();
+    }
+
+    // Gerak ke Power Up
+
+    private command powerUpStrat(){
+        int a = currentWorm.position.x;
+        int b = currentWorm.position.y;
+        int c = powerup.position.x
+        int d = powerup.position.y
+
+        if (euclideanDistance(a,b,c,d) > 3) {
+            Direction moveDirection = resolveDirection(
+                    currentWorm.position,
+                    powerup.position
+            );
+            Cell block = getCellToMove(moveDirection);
+            if (block.type == CellType.AIR && !IsCellOccupied(block)) {
+                return new MoveCommand(block.x, block.y);
+            } else if (block.type == CellType.DIRT) {
+                return new DigCommand(block.x, block.y);
+            }
+        }
+        digMoveto(moveDirection)
+
+
+    }
+
+    private digMoveto(Direction moveDirection){
+        List<Cell> directionCell = getCellToMove(moveDirection);
+
+        for(int i = 0; i < directionCell.size(); i++){
+            cell targetCell = directionCell.get(i);
+            if (targetCell.x == x && targetCell.y == y) {
+                if (targetCell.type == CellType.DIRT) {
+                    return new DigCommand(x,y);
+                } else {
+                    return new MoveCommand(x,y);
+                }
+            }
+
+
     }
 
 
@@ -289,6 +343,8 @@ public class Bot {
         }
         return false;
     }
+
+    
 
     // Default Functions
     private List<List<Cell>> constructFireDirectionLines(int range) {
