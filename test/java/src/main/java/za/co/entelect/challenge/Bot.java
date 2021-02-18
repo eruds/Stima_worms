@@ -75,7 +75,7 @@ public class Bot {
 
         // powerup start
 
-        int i;
+        
         int powerupCount = 0;
         for (i = 0; i<=5; i++){
             if (powerupCount == 0){
@@ -145,8 +145,8 @@ public class Bot {
     private command powerUpStrat(){
         int a = currentWorm.position.x;
         int b = currentWorm.position.y;
-        int c = powerup.position.x
-        int d = powerup.position.y
+        int c = powerup.position.x;
+        int d = powerup.position.y;
 
         if (euclideanDistance(a,b,c,d) > 3) {
             Direction moveDirection = resolveDirection(
@@ -160,7 +160,7 @@ public class Bot {
                 return new DigCommand(block.x, block.y);
             }
         }
-        digMoveto(moveDirection)
+        digMoveto(moveDirection);
 
 
     }
@@ -177,7 +177,7 @@ public class Bot {
                     return new MoveCommand(x,y);
                 }
             }
-
+        }
 
     }
 
