@@ -75,9 +75,9 @@ public class Bot {
 
         // powerup start
 
-        int i = 0;
+        int i;
         int powerupCount = 0;
-        for (i; i<=5; i++){
+        for (i = 0; i<=5; i++){
             if (powerupCount == 0){
                 powerUpStrat();
             }
