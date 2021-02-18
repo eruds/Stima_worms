@@ -58,6 +58,66 @@ public class Bot {
 
         }
 
+        // Follow strategy start
+        int i;
+        int leaderId = 1;
+        for (i = 1; i <= 3; i++) {
+            if (currentWorm.id == i && currentWorm.health > 0) {
+                leaderId = i;
+            }
+        }
+
+        if (currentWorm.id != leaderId) {
+            return Follow(leaderId);
+        }
+        // Follow strategy end
+
+        Cell block = getCellToMove(moveDirection);
+        if (block.type == CellType.AIR && !IsCellOccupied(block)) {
+            return new MoveCommand(block.x, block.y);
+        } else if (block.type == CellType.DIRT) {
+            return new DigCommand(block.x, block.y);
+        }
+        return new DoNothingCommand();
+    }
+
+    // Follow command
+    private Command Follow(int leaderId) {
+        // Look for the leader, default commando
+        Worm leader = myWorms[0];
+        for(Worm worm : myWorms){
+            if(currentWorm.id == leaderId) {
+                leader = worm;
+                break;
+            }
+        }
+
+        int a = currentWorm.position.x;
+        int b = currentWorm.position.y;
+        int c = leader.position.x;
+        int d = leader.position.y;
+
+        // Go to leader if far away
+        if (euclideanDistance(a,b,c,d) > 3) {
+            Direction moveDirection = resolveDirection(
+                    currentWorm.position,
+                    leader.position
+            );
+            Cell block = getCellToMove(moveDirection);
+            if (block.type == CellType.AIR && !IsCellOccupied(block)) {
+                return new MoveCommand(block.x, block.y);
+            } else if (block.type == CellType.DIRT) {
+                return new DigCommand(block.x, block.y);
+            }
+        }
+
+        // Approach enemy if leader is close
+        Position closestWormPosition = getClosestEnemyWormPosition(currentWorm.position.x, currentWorm.position.y);
+        Direction moveDirection = resolveDirection(
+                currentWorm.position,
+                closestWormPosition
+        );
+
         Cell block = getCellToMove(moveDirection);
         if (block.type == CellType.AIR && !IsCellOccupied(block)) {
             return new MoveCommand(block.x, block.y);
