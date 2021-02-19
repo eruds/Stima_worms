@@ -1,4 +1,4 @@
-i.Strategi Greedy yang Digunakan
+# i.Strategi Greedy yang Digunakan
 
 Program ini menggunakan kombinasi beberapa strategi untuk memaksimalkan potensi kemenangan, tergantung gameState pada saat tertentu.
 
@@ -8,11 +8,11 @@ Strategi diurutkan dengan prioritas Swarm Attack, Attack Closest Enemy, kemudian
 
 Kondisi gamestate yang dipertimbangkan adalah sebagai berikut :
 
-> Apabila tidak ada worm musuh yang terlalu dekat, maka atur agar worm player untuk mendekati atau menyerang worm target ( Worm yang dijadikan sasaran utama dalam strategi Swarm Attack ).
+1. Apabila tidak ada worm musuh yang terlalu dekat, maka atur agar worm player untuk mendekati atau menyerang worm target ( Worm yang dijadikan sasaran utama dalam strategi Swarm Attack ).
 
-> Jika ada worm yang terlalu dekat, worm player akan mulai menyerang worm lawan yang terlalu dekat, sementara worm player lainnya tetap memfokuskan serangan terhadap worm target.
+2. Jika ada worm yang terlalu dekat, worm player akan mulai menyerang worm lawan yang terlalu dekat, sementara worm player lainnya tetap memfokuskan serangan terhadap worm target.
 
-> Jika health point yang dimiliki worm player berada diantara range 30 dan 50, dan masih ada healthpack yang tersedia di map, maka worm akan memilih untuk mencari healthpack terlebih dahulu.
+3. Jika health point yang dimiliki worm player berada diantara range 30 dan 50, dan masih ada healthpack yang tersedia di map, maka worm akan memilih untuk mencari healthpack terlebih dahulu.
 
 # ii. Persyaratan lingkungan
 
