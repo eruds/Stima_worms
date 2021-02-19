@@ -1,0 +1,8 @@
+{
+	"author": "American Standard Entreprise",
+	"email": "NotTheActualAmericanStandardToiletCompany@mail.com",
+	"nickName": "American Standard",
+	"botLocation": "/bin",
+	"botFileName": "java-sample-bot-jar-with-dependencies.jar",
+	"botLanguage": "java"
+}
