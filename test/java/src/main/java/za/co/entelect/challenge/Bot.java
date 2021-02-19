@@ -1,6 +1,5 @@
 package za.co.entelect.challenge;
 
-import jdk.internal.org.jline.reader.Candidate;
 import za.co.entelect.challenge.command.*;
 import za.co.entelect.challenge.entities.*;
 import za.co.entelect.challenge.enums.CellType;
@@ -11,21 +10,21 @@ import java.util.stream.Collectors;
 
 public class Bot {
 
-    private Random random;
+//    private Random random;
     private GameState gameState;
     private Opponent opponent;
     private MyWorm currentWorm;
     private MyWorm[] myWorms;
-    private String previousCommand;
+//    private String previousCommand;
 
     public Bot(Random random, GameState gameState) {
-        this.random = random;
+//        this.random = random;
         this.gameState = gameState;
         this.opponent = gameState.opponents[0];
         this.currentWorm = getCurrentWorm(gameState);
         // Added
         this.myWorms = gameState.myPlayer.worms;
-        this.previousCommand = gameState.myPlayer.previousCommand.split(" ")[0];
+//        this.previousCommand = gameState.myPlayer.previousCommand.split(" ")[0];
     }
 
     private MyWorm getCurrentWorm(GameState gameState) {
@@ -36,56 +35,58 @@ public class Bot {
     }
 
     public Command run() {
-        Worm closestWorm = getClosestEnemyWorm(currentWorm.position.x, currentWorm.position.y);
-        Position targetWorm = closestWorm.position;
-//        Position targetWorm = opponent.worms[1].health < 0 ? opponent.worms[1] : closestWorm.position;
-        Direction moveDirection = getBestMove(resolveDirection(
-                currentWorm.position,
-                targetWorm
-        ));
+//        if(currentWorm.roundsUntilUnfrozen > 0){
+//            int[] ids = {1,2,3};
+//            ids = Arrays.stream(ids).filter(id -> id != currentWorm.id).toArray();
+//            return new SelectCommand(ids[0], "Move ");
+//        }
 
+//        if(currentWorm.health <= 50){
+//            powerUpStrat();
+//        }
 
+        // Attack the closest worm with the priority of
+        // Distance > IsFrozen > LowHealth
+        // Worm closestWorm = getClosestEnemyWorm(currentWorm.position.x, currentWorm.position.y);
+
+        // Always Target Only One Worm
+        Position targetWorm = swarmAttack();
+
+        // Target One Worm, after that attack the closest worm
+        // Position targetWorm = opponent.worms[1].health < 0 ? opponent.worms[1] : closestWorm.position;
+
+        // Check if you can bomb the target
         if (currentWorm.id == 2 && canBananaBomb(targetWorm.x, targetWorm.y)) {
             return new ThrowBananaBomb(targetWorm.x, targetWorm.y);
-//
-//            if( !previousCommand.equals("move") && !previousCommand.equals("dig")){
-//            }
         }
 
+        // Check if you can throw snowball to the target worm
         if (currentWorm.id == 3 && canSnowball(targetWorm.x, targetWorm.y)) {
             return new ThrowSnowball(targetWorm.x, targetWorm.y);
         }
-
+//
+        // Check if you can shoot the closest enemy worm
         if(canShootEnemy(targetWorm.x, targetWorm.y)){
             Direction direction = resolveDirection(currentWorm.position, targetWorm);
             return new ShootCommand(direction);
-
         }
 
-
-        // powerup start
-
-        
-        int powerupCount = 0;
-        for (i = 0; i<=5; i++){
-            if (powerupCount == 0){
-                powerUpStrat();
-                Direction powerupDirection = resolveDirection(
-                    currentWorm.position,
-                    powerup.position
-            );
-                digMoveto(powerupDirection);
-            }
-        }
-
+        Direction moveDirection = resolveDirection(
+                currentWorm.position,
+                targetWorm
+        );
 
         Cell block = getCellToMove(moveDirection);
+        moveDirection = !IsCellOccupied(block) ? moveDirection : getBestMove(moveDirection);
+        block = getCellToMove(moveDirection);
+
         if (block.type == CellType.AIR) {
             return new MoveCommand(block.x, block.y);
         } else if (block.type == CellType.DIRT) {
             return new DigCommand(block.x, block.y);
         }
         return new DoNothingCommand();
+
     }
 
 
@@ -163,9 +164,7 @@ public class Bot {
 
 
     private Direction getBestMove(Direction Move){
-        if(!IsCellOccupied(getCellToMove(Move))){
-            return Move;
-        }
+        // If the current move candidate is occupied, look for other candidate
         String direction = Direction.getDirection(Move.x, Move.y);
         String[] Neighbors = Direction.getNeighbors(direction);
         for(String Neighbor : Neighbors){
@@ -178,9 +177,13 @@ public class Bot {
                                         NeighborDirection.x+Move.x,
                                         NeighborDirection.y+Move.y));
             }
-
+            // Candidate direction next to the current direction
             if(!IsCellOccupied(getCellToMove(CandidateDirection))){
                 return CandidateDirection;
+            }
+            // Second Best candidate direction.
+            if(!IsCellOccupied(getCellToMove(NeighborDirection))){
+                return NeighborDirection;
             }
         }
         return Move;
@@ -257,54 +260,54 @@ public class Bot {
 
     }
 
-  // Gerak ke Power Up
+    // Gerak ke Power Up
 
-  private command powerUpStrat(){
-    int a = currentWorm.position.x;
-    int b = currentWorm.position.y;
-    int c = powerup.position.x;
-    int d = powerup.position.y;
-
-    if (euclideanDistance(a,b,c,d) > 3) {
-        Direction moveDirection = resolveDirection(
-                currentWorm.position,
-                powerup.position
-        );
-        Cell block = getCellToMove(moveDirection);
-        if (block.type == CellType.AIR && !IsCellOccupied(block)) {
-            return new MoveCommand(block.x, block.y);
-        } else if (block.type == CellType.DIRT) {
-            return new DigCommand(block.x, block.y);
-        }
-    }
-    return new DoNothingCommand();
-}
-
-private digMoveto(Direction moveDirection){
-    List<Cell> directionCell = getCellToMove(moveDirection);
-
-    for(int i = 0; i < directionCell.size(); i++){
-        cell targetCell = directionCell.get(i);
-        if (targetCell.x == x && targetCell.y == y) {
-            if (targetCell.type == CellType.DIRT) {
-                return new DigCommand(x,y);
-            } else if(targetCell.type == CellType.AIR && !IsCellOccupied(block)) {
-                return new MoveCommand(x,y);
-            }
-        }
-    }
-
-    return digMoveto(moveDirection);
-
-}
+//    private Command powerUpStrat(){
+//        int a = currentWorm.position.x;
+//        int b = currentWorm.position.y;
+//        int c = powerup.position.x;
+//        int d = powerup.position.y;
+//
+//        if (euclideanDistance(a,b,c,d) > 3) {
+//            Direction moveDirection = resolveDirection(
+//                    currentWorm.position,
+//                    powerup.position
+//            );
+//            Cell block = getCellToMove(moveDirection);
+//            if (block.type == CellType.AIR && !IsCellOccupied(block)) {
+//                return new MoveCommand(block.x, block.y);
+//            } else if (block.type == CellType.DIRT) {
+//                return new DigCommand(block.x, block.y);
+//            }
+//        }
+//        digMoveto(moveDirection);
+//
+//
+//    }
+//
+//    private Command digMoveto(Direction moveDirection){
+//        List<Cell> directionCell = getCellToMove(moveDirection);
+//
+//        for(int i = 0; i < directionCell.size(); i++){
+//            cell targetCell = directionCell.get(i);
+//            if (targetCell.x == x && targetCell.y == y) {
+//                if (targetCell.type == CellType.DIRT) {
+//                    return new DigCommand(x,y);
+//                } else {
+//                    return new MoveCommand(x,y);
+//                }
+//            }
+//        }
+//
+//    }
 
     // Attack Helpers
     private HashMap<String, ArrayList<Worm>> wormInAttackRadius(int x, int y, int damageRadius){
         HashMap<String, ArrayList<Worm>> wormsInArea = new HashMap<>() ;
-        wormsInArea.put("Player", new ArrayList<Worm>());
-        wormsInArea.put("Opponent", new ArrayList<Worm>());
+        wormsInArea.put("Player", new ArrayList<>());
+        wormsInArea.put("Opponent", new ArrayList<>());
 
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < this.myWorms.length; i++){
             MyWorm myWorm = this.myWorms[i];
             Worm opponent = this.opponent.worms[i];
             int distancePlayer = euclideanDistance(myWorm.position.x, myWorm.position.y, x, y);
@@ -314,33 +317,21 @@ private digMoveto(Direction moveDirection){
             }
 
             if(distanceOpponent <= damageRadius){
-                wormsInArea.get("Player").add(opponent);
+                wormsInArea.get("Opponent").add(opponent);
             }
         }
+
         return wormsInArea;
     }
 
-    private Position swarmAttack(int wormId){
-        Worm OpponentWorm = opponent.worms[wormId-1];
-        int i = 0;
-        while(OpponentWorm.health < 0){
-            OpponentWorm = opponent.worms[i];
-            i+= 1;
+    private Position swarmAttack(){
+        int wormId = 1;
+        Worm targetWorm = opponent.worms[wormId-1];
+        while(targetWorm.health <= 0){
+            wormId = wormId < 3 ? wormId + 1 : 1;
+            targetWorm = opponent.worms[wormId-1];
         }
-//
-//        int count = 0;
-//        for(Worm worm : myWorms){
-//            int distance = euclideanDistance()
-//        }
-
-//        if(OpponentWorm.health > 0){
-//            for(Worm worm : opponent.worms){
-//                if(worm.id != wormId){
-//                    return worm.position;
-//                }
-//            }
-//        }
-        return OpponentWorm.position;
+        return targetWorm.position;
     }
 
     // Attacks
@@ -369,22 +360,23 @@ private digMoveto(Direction moveDirection){
     }
 
     private boolean canBananaBomb(int x, int y) {
-            // Check if the current worm is an Agent
-            if ( isValidCoordinate(x, y) && currentWorm.bananaBombs.count > 0) {
-                // Checking if the opponent worm is close enough
-                int bombRange = currentWorm.bananaBombs.range;
-                int distance = euclideanDistance(currentWorm.position.x, currentWorm.position.y, x, y);
-                if (distance > bombRange) {
-                    return false;
-                }
-
-                //Checking if there's any of our player worm in the target
-                int damageRadius = currentWorm.bananaBombs.damageRadius;
-                HashMap<String, ArrayList<Worm>> wormsInArea = wormInAttackRadius(x,y,damageRadius);
-                return wormsInArea.get("Player").size() <= 0 && wormsInArea.get("Opponent").size() >= 1;
+        // Check if the current worm is an Agent
+        if ( isValidCoordinate(x, y) && currentWorm.bananaBombs.count > 0) {
+            // Checking if the opponent worm is close enough
+            int bombRange = currentWorm.bananaBombs.range;
+            int distance = euclideanDistance(currentWorm.position.x, currentWorm.position.y, x, y);
+            if (distance > bombRange) {
+                return false;
             }
+
+            //Checking if there's any of our player worm in the target
+            int damageRadius = currentWorm.bananaBombs.damageRadius;
+            HashMap<String, ArrayList<Worm>> wormsInArea = wormInAttackRadius(x,y,damageRadius);
+            return (wormsInArea.get("Player").size() == 0 && wormsInArea.get("Opponent").size() >= 1);
+        }
         return false;
     }
+
 
     private boolean canSnowball(int x, int y) {
         if (isValidCoordinate(x, y) && currentWorm.snowballs.count > 0) {
@@ -400,12 +392,15 @@ private digMoveto(Direction moveDirection){
             HashMap<String, ArrayList<Worm>> wormsInArea = wormInAttackRadius(x,y,damageRadius);
             ArrayList<Worm> OpponentWorms = wormsInArea.get("Opponent");
             for(Worm worm : OpponentWorms){
+//                System.out.println(worm.roundsUntilUnfrozen);
+//                System.out.println(worm.position.x + " " + worm.position.y);
                 if(worm.roundsUntilUnfrozen > 1){
                     return false;
                 }
             }
 
-            return wormsInArea.get("Player").size() <= 0 && wormsInArea.get("Opponent").size() >= 2;
+            return (wormsInArea.get("Player").size() == 0 && wormsInArea.get("Opponent").size() >= 2)
+                    || (wormsInArea.get("Player").size() == 0 || currentWorm.health <= 50);
         }
         return false;
     }
