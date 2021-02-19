@@ -1,8 +1,8 @@
 {
-	"author": "American Standard Entreprise",
+	"author": "Kelompok 20 - American Standard Enterprise",
 	"email": "NotTheActualAmericanStandardToiletCompany@mail.com",
 	"nickName": "American Standard",
-	"botLocation": "/bin",
-	"botFileName": "java-sample-bot-jar-with-dependencies.jar",
+	"botLocation": "./bin",
+	"botFileName": "Kelompok20_American_Standard.jar",
 	"botLanguage": "java"
 }

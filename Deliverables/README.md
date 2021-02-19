@@ -1,20 +1,38 @@
-# Java starter bot
+i.Strategi Greedy yang Digunakan
 
-## Environment requirements
+Program ini menggunakan kombinasi beberapa strategi untuk memaksimalkan potensi kemenangan, tergantung gameState pada saat tertentu.
 
-Install the Java SE Development Kit 8 for your environment here: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+Kombinasi strategi yang digunakan adalah strategi Swarm Attack, Attack Closest Enemy, dan Hunt for Healthpack, yang penggunaannya disesuaikan dengan gameState. Swarm Attack menyerang hanya satu Worm lawan, Closest Enemy menyerang Worm lawan terdekat, dan Hunt for Healthpack mencari healthpack terdekat. Penggunaan kombinasi strategi ini adalah untuk memaksimalkan potensi menang dengan memanfaatkan kondisi gameState yang selalu berubah pada setiap ronde.
 
-Make sure JAVA_HOME system variable is set, Windows 10 tutorial here: https://www.mkyong.com/java/how-to-set-java_home-on-windows-10/
+Strategi diurutkan dengan prioritas Swarm Attack, Attack Closest Enemy, kemudian Hunt for Healthpack. Tujuan dari algoritma ini adalah menentukan apakah kita harus menyerang satu worm, menyerang worm terdekat, atau mencari healthpack.
 
-Install IntelliJ IDEA here: https://www.jetbrains.com/idea/download/
-The community edition is free.
+Kondisi gamestate yang dipertimbangkan adalah sebagai berikut :
 
-## Building
+> Apabila tidak ada worm musuh yang terlalu dekat, maka atur agar worm player untuk mendekati atau menyerang worm target ( Worm yang dijadikan sasaran utama dalam strategi Swarm Attack ).
 
-Make your modifications to the starter bot using IntelliJ. Once you are happy with your changes, package your bot by opening up the "Maven Projects" tab on the right side of the screen. From here go to the  "java-sample-bot" > "Lifecycle" group and double-click "Install"
-This  will create a .jar file in the folder called "target". The file will be called "java-sample-bot-jar-with-dependencies.jar".
+> Jika ada worm yang terlalu dekat, worm player akan mulai menyerang worm lawan yang terlalu dekat, sementara worm player lainnya tetap memfokuskan serangan terhadap worm target.
 
-## Running 
+> Jika health point yang dimiliki worm player berada diantara range 30 dan 50, dan masih ada healthpack yang tersedia di map, maka worm akan memilih untuk mencari healthpack terlebih dahulu.
 
-To run the bot, copy the file "java-sample-bot-jar-with-dependencies.jar" to a different location. Then go to the starter-pack and edit the config.json file accordingly.
-Then run the "run.bat" file on windows or the "run.sh" file for unix.
+# ii. Persyaratan lingkungan
+
+Instal Java SE Development Kit 8 untuk lingkungan Anda dari link ini: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+Pastikan variabel sistem JAVA_HOME diatur, tutorial Windows 10 di sini: https://www.mkyong.com/java/how-to-set-java_home-on-windows-10/
+
+Bot membutuhkan game runner dan game engine yang tersedia pada starter pack Entelenct Challenge Worms 2019 pada link berikut : https://github.com/EntelectChallenge/2019-Worms/releases/tag/2019.3.2
+
+# iii. Cara Menjalankan Program
+
+Untuk menjalankan bot, user harus menyesuaikan pengaturan pada file game-runner-config.json untuk mengarahkan game runner kepada folder yang memuat bot.json metadata dan file Kelompok20_American_Standard.jar
+
+Kemudian jalankan file "run.bat" di windows atau file "run.sh" untuk unix.
+
+# iv. Author
+
+Bot ini dibuat oleh Kelompok 20, dengan nama American Standard sebagai pemenuhan tugas besar 1 Strategi Algoritma Semester 4 IF ITB 2020/2021.
+Berikut adalah nama nama anggota kelompok :
+
+1. Mahameru Ds
+2. Ilyasa Salafi Putra Jamal
+3. R. B. Wishnumurti
