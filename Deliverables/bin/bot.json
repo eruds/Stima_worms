@@ -2,7 +2,7 @@
 	"author": "Kelompok 20 - American Standard Enterprise",
 	"email": "NotTheActualAmericanStandardToiletCompany@mail.com",
 	"nickName": "American Standard",
-	"botLocation": "./bin",
+	"botLocation": "/",
 	"botFileName": "Kelompok20_American_Standard.jar",
 	"botLanguage": "java"
 }
